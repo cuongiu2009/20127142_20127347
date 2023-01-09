@@ -1,54 +1,68 @@
-pipeline {
+pipeline{
 
-  agent any
+	agent any
 
-  environment {
-    DOCKER_IMAGE = "nhtua/flask-docker"
-  }
+	environment {
+		DOCKERHUB_CREDENTIALS=credentials('dockerhub')
+	}
 
-  stages {
-    stage("Test") {
-      agent {
-          docker {
-            image 'python:3.8-slim-buster'
-            args '-u 0:0 -v /tmp:/root/.cache'
-          }
-      }
-      steps {
-        sh "pip install poetry"
-        sh "poetry install"
-        sh "poetry run pytest"
-      }
-    }
+	stages {
 
-    stage("build") {
-      agent { node {label 'master'}}
-      environment {
-        DOCKER_TAG="${GIT_BRANCH.tokenize('/').pop()}-${GIT_COMMIT.substring(0,7)}"
-      }
-      steps {
-        sh "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} . "
-        sh "docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_IMAGE}:latest"
-        sh "docker image ls | grep ${DOCKER_IMAGE}"
-        withCredentials([usernamePassword(credentialsId: 'docker-hub', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-            sh 'echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin'
-            sh "docker push ${DOCKER_IMAGE}:${DOCKER_TAG}"
-            sh "docker push ${DOCKER_IMAGE}:latest"
-        }
+		stage('Build') {
 
-        //clean to save disk
-        sh "docker image rm ${DOCKER_IMAGE}:${DOCKER_TAG}"
-        sh "docker image rm ${DOCKER_IMAGE}:latest"
-      }
-    }
-  }
+			steps {
+				sh 'docker build -t advanced-network-jenkins:latest .'
+			}
+		}
 
-  post {
-    success {
-      echo "SUCCESSFUL"
-    }
-    failure {
-      echo "FAILED"
-    }
-  }
+		stage('Login') {
+
+			steps {
+				sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+			}
+		}
+		
+		
+		stage('View Images') {
+
+			steps {
+				sh 'docker images'
+			}
+		}
+		
+		stage('Docker Tag') {
+
+			steps {
+				sh 'docker tag advanced-network-jenkins datkira/advanced-network-jenkins'
+			}
+		}
+
+		stage('Push') {
+
+			steps {
+				sh 'docker push datkira/advanced-network-jenkins'
+			}
+		}
+		
+		stage('Remove current container if it exists') {
+
+			steps {
+				sh 'docker rm -f jenkins-mmt || true'
+			}
+		}
+		
+		stage('Run in Container') {
+
+			steps {
+				sh 'docker run --publish 3000:3000 --name jenkins-mmt -d --rm datkira/advanced-network-jenkins:latest'
+			}
+		}
+	}
+
+	post {
+		always {
+			sh 'docker logout'
+		}
+	}
+
 }
