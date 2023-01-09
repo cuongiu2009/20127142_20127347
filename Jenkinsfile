@@ -9,7 +9,7 @@ pipeline {
         }
         stage('Docker'){
             steps{
-                sh 'docker build -t 20127142/20127142_20127347:latest .'
+                sh 'docker build -t 20127142/20127142_20127347:v10 .'
             }
         }
     }
