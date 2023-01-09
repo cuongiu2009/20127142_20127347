@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Hello') {
             steps {
-                echo 'Hello World'
+                git 'https://github.com/cuongiu2009/20127142_20127347.git'
             }
         }
     }
