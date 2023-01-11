@@ -21,7 +21,7 @@ pipeline {
         stage('Push') {
 
 			steps {
-				sh 'docker push datkira/advanced-network-jenkins'
+				sh 'docker push 20127142/jenkins'
 			}
 		}
 		
@@ -35,7 +35,7 @@ pipeline {
 		stage('Run in Container') {
 
 			steps {
-				sh 'docker run --publish 3000:3000 --name jenkins-mmt -d --rm datkira/advanced-network-jenkins:latest'
+				sh 'docker run --publish 3000:3000 --name jenkins-mmt -d --rm 20127142/jenkins:latest'
 			}
 		}
     }
