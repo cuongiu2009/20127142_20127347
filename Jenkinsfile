@@ -18,15 +18,25 @@ pipeline {
                 echo 'Building..'
             }
         }
-        stage('Test') {
-            steps {
-                echo 'Testing..'
-            }
-        }
-        stage('Deploy') {
-            steps {
-                echo 'Deploying....'
-            }
-        }
+        stage('Push') {
+
+			steps {
+				sh 'docker push datkira/advanced-network-jenkins'
+			}
+		}
+		
+		stage('Remove current container if it exists') {
+
+			steps {
+				sh 'docker rm -f jenkins-mmt || true'
+			}
+		}
+		
+		stage('Run in Container') {
+
+			steps {
+				sh 'docker run --publish 3000:3000 --name jenkins-mmt -d --rm datkira/advanced-network-jenkins:latest'
+			}
+		}
     }
 }
