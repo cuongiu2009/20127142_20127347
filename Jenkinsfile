@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     stages {
-        stage('Build') {
+        stage('Docker build') {
 
 			steps {
 				sh 'docker build -t jenkins:latest .'
