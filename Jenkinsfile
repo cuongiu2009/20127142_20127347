@@ -1,24 +1,35 @@
-pipeline {
-    agent any
+stages {
 
-    stages {
-        stage('Docker build') {
-	        steps {
-		        sh 'docker build -t jenkins:latest .'
-	        }
-	    }
-        stage('View Images') {
+		stage('Build') {
+
+			steps {
+				sh 'docker build -t jenkins:latest .'
+			}
+		}
+
+		stage('Login') {
+
+			steps {
+				sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+			}
+		}
+		
+		
+		stage('View Images') {
+
 			steps {
 				sh 'docker images'
 			}
 		}
-	
-        stage('Build') {
-            steps {
-                echo 'Building..'
-            }
-        }
-        stage('Push') {
+		
+		stage('Docker Tag') {
+
+			steps {
+				sh 'docker tag advanced-network-jenkins datkira/advanced-network-jenkins'
+			}
+		}
+
+		stage('Push') {
 
 			steps {
 				sh 'docker push 20127142/jenkins'
@@ -38,5 +49,10 @@ pipeline {
 				sh 'docker run --publish 3000:3000 --name jenkins-mmt -d --rm 20127142/jenkins:latest'
 			}
 		}
-    }
-}
+	}
+
+	post {
+		always {
+			sh 'docker logout'
+		}
+	}
