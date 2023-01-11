@@ -1,4 +1,7 @@
-stages {
+pipeline {
+    agent any
+
+    stages {
 
 		stage('Build') {
 
@@ -25,7 +28,7 @@ stages {
 		stage('Docker Tag') {
 
 			steps {
-				sh 'docker tag advanced-network-jenkins datkira/advanced-network-jenkins'
+				sh 'docker tag jenkins 20127142/jenkins'
 			}
 		}
 
@@ -56,3 +59,4 @@ stages {
 			sh 'docker logout'
 		}
 	}
+}
