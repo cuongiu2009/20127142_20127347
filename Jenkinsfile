@@ -3,11 +3,16 @@ pipeline {
 
     stages {
         stage('Docker build') {
-
+	        steps {
+		        sh 'docker build -t jenkins:latest .'
+	        }
+	    }
+        stage('View Images') {
 			steps {
-				sh 'docker build -t jenkins:latest .'
+				sh 'docker images'
 			}
 		}
+	
         stage('Build') {
             steps {
                 echo 'Building..'
