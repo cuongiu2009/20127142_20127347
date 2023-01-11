@@ -3,6 +3,12 @@ pipeline {
 
     stages {
         stage('Build') {
+
+			steps {
+				sh 'docker build -t jenkins:latest .'
+			}
+		}
+        stage('Build') {
             steps {
                 echo 'Building..'
             }
