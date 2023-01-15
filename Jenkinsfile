@@ -51,7 +51,7 @@ pipeline {
 		stage('Run in Container') {
 
 			steps {
-				sh 'docker run --publish 3000:3000 --name jenkins-mmt -d --rm 20127142/jenkins:latest'
+				sh 'docker run --publish 8080:8080 --name jenkins-mmt -d --rm 20127142/jenkins:latest'
 			}
 		}
 	}
